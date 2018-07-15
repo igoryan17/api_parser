@@ -6,6 +6,8 @@ from selenium import webdriver
 
 import links_parser
 
+LOADING_WAIT_TIME = 7
+
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
@@ -15,6 +17,12 @@ link = next(iter(links))
 
 driver = webdriver.Chrome('C:\Tools\chromedriver.exe')
 driver.get(link)
-time.sleep(5)
-section = driver.find_elements_by_xpath('//section/div')
-print(section)
+time.sleep(LOADING_WAIT_TIME)
+sections = links_parser.parse_sections(driver)
+section = next(iter(sections))
+article = links_parser.parse_article_name(section)
+print(article)
+print(links_parser.parse_query_type(article))
+print(links_parser.parse_request_url(section))
+print(links_parser.parse_request_body(section))
+driver.close()

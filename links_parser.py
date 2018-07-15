@@ -1,6 +1,6 @@
 from lxml import etree
 
-query_types_map = {'create': 'POST', 'delete': 'DELETE', 'edit': 'PUT', 'get': 'GET'}
+query_types_map = {'POST': 'create', 'DELETE': 'delete', 'PUT': 'edit', 'GET': 'get'}
 
 
 def parse_links_to_api(page):
@@ -14,5 +14,30 @@ def parse_links_to_api(page):
 
 
 def parse_sections(driver):
-    sections = driver.find_element_by_xpath("//section/div")
+    sections = driver.find_elements_by_xpath("//section/div")
     return sections
+
+
+def parse_article_name(section):
+    article = section.find_element_by_xpath('article/div/h1')
+    return article.text
+
+
+def parse_query_type(article):
+    for query, text in query_types_map.items():
+        if text in article.lower():
+            return query
+
+
+def parse_request_url(section):
+    result = ''
+    for line in section.find_elements_by_xpath('article/pre/code/span'):
+        result += line.text
+    return result
+
+
+def parse_request_body(section):
+    result = ''
+    for line in section.find_elements_by_xpath('article/div/div/pre/code/span'):
+        result += line.text
+    return result
