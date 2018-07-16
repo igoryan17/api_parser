@@ -41,3 +41,7 @@ def parse_request_body(section):
     for line in section.find_elements_by_xpath('article/div/div/pre/code/span'):
         result += line.text
     return result
+
+
+def parse_page_tittle(driver):
+    return driver.find_element_by_id("sections").find_element_by_xpath('./section/h1').text

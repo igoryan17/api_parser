@@ -5,6 +5,7 @@ import time
 from selenium import webdriver
 
 import links_parser
+import postman_collection_writer
 
 LOADING_WAIT_TIME = 7
 
@@ -18,11 +19,14 @@ link = next(iter(links))
 driver = webdriver.Chrome('C:\Tools\chromedriver.exe')
 driver.get(link)
 time.sleep(LOADING_WAIT_TIME)
+tittle = links_parser.parse_page_tittle(driver)
+collection = postman_collection_writer.create_main_body(tittle)
 for section in links_parser.parse_sections(driver):
     article = links_parser.parse_article_name(section)
-    print(article)
-    print(links_parser.parse_query_type(article))
-    print(links_parser.parse_request_url(section))
-    print(links_parser.parse_request_body(section))
-    print()
+    method = links_parser.parse_query_type(article)
+    body = links_parser.parse_request_body(section)
+    api_url = links_parser.parse_request_url(section)
+    item = postman_collection_writer.create_item(article, method, body, api_url)
+    collection['item'].append(item)
 driver.close()
+print(collection)
