@@ -20,6 +20,7 @@ for link in links_parser.parse_links_to_api(page):
     driver.get(link)
     time.sleep(LOADING_WAIT_TIME)
     tittle = links_parser.parse_page_tittle(driver)
+    print('parse link ', link, ' tittle ', tittle)
     collection = postman_collection_writer.create_main_body(tittle)
     for section in links_parser.parse_sections(driver):
         article = links_parser.parse_article_name(section)
