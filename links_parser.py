@@ -32,14 +32,14 @@ def parse_query_type(article):
 def parse_request_url(section):
     result = ''
     for line in section.find_elements_by_xpath('article/pre/code/span'):
-        result += line.text
+        result.join(line.text)
     return result
 
 
 def parse_request_body(section):
     result = ''
     for line in section.find_elements_by_xpath('article/div/div/pre/code/span'):
-        result += line.text
+        result.join(line.text)
     return result
 
 
