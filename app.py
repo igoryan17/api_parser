@@ -4,6 +4,7 @@ import time
 import urllib.request
 
 from selenium import webdriver
+from multiprocessing.dummy import Pool as ThreadPool
 
 import links_parser
 import postman_collection_writer
@@ -14,9 +15,11 @@ ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 page = urllib.request.urlopen('https://10.101.72.106/docs/rest/', context=ctx)
-driver = webdriver.Chrome('C:\Tools\chromedriver.exe')
+pool = ThreadPool(4)
 
-for link in links_parser.parse_links_to_api(page):
+
+def parse_and_write(link):
+    driver = webdriver.Chrome('C:\Tools\chromedriver.exe')
     driver.get(link)
     time.sleep(LOADING_WAIT_TIME)
     tittle = links_parser.parse_page_tittle(driver)
@@ -37,7 +40,11 @@ for link in links_parser.parse_links_to_api(page):
             continue
         item = postman_collection_writer.create_item(article, method, body, api_url)
         collection['item'].append(item)
+    driver.close()
     with open('out/' + tittle.replace(' ', '_') + '.json', 'w') as outfile:
         json.dump(collection, outfile)
 
-driver.close()
+
+links = links_parser.parse_links_to_api(page)
+pool.map(parse_and_write, links)
+pool.close()
